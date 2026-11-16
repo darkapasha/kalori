@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>SalimBabanınZayıflamaUygulaması</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zayıflama">
+<meta name="theme-color" content="#0f1412">
+<style>
+:root{
+  --bg:#0f1412;--kart:#18201c;--kart2:#212b26;--cizgi:#2c3832;--yazi:#eef3ef;--soluk:#93a39a;
+  --yesil:#4ade80;--yesil2:#22c55e;--sari:#facc15;--kirmizi:#f87171;--mavi:#60a5fa;--turuncu:#fb923c;--mor:#c084fc;
+  --r:18px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--yazi);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom));min-height:100vh;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,select{font:inherit;color:var(--yazi);background:var(--kart2);border:1px solid var(--cizgi);border-radius:12px;padding:11px 12px;width:100%;outline:none}
+input:focus,select:focus{border-color:var(--yesil2)}
+.sayfa{display:none;padding:12px 16px 24px;max-width:560px;margin:0 auto}
+.sayfa.acik{display:block}
+.kart{background:var(--kart);border-radius:var(--r);padding:16px;margin-bottom:12px}
+h2{font-size:15px;margin:0 0 10px;color:var(--soluk);font-weight:600;letter-spacing:.2px}
+.ust{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+.ust .tarih{font-weight:700;font-size:17px}
+.ust button{width:40px;height:40px;border-radius:12px;background:var(--kart);font-size:18px}
+.halka-kutu{display:flex;align-items:center;gap:16px}
+.halka{position:relative;width:150px;height:150px;flex:none}
+.halka svg{transform:rotate(-90deg)}
+.halka .ic{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.halka .sayi{font-size:34px;font-weight:800;line-height:1}
+.halka .alt{font-size:12px;color:var(--soluk);margin-top:4px}
+.ozet{flex:1;min-width:0;display:grid;gap:8px;font-size:13px}
+.ozet .satir{display:flex;justify-content:space-between;gap:6px;white-space:nowrap}
+.ozet b{font-weight:700}
+#sinirNot{white-space:normal}
+@media (max-width:400px){.halka{width:124px;height:124px}.halka svg{width:124px;height:124px}.halka .sayi{font-size:28px}.halka-kutu{gap:12px}}
+.makro{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.makro .m{font-size:12px;color:var(--soluk)}
+.makro .m b{display:block;color:var(--yazi);font-size:14px}
+.cubuk{height:6px;border-radius:3px;background:var(--kart2);overflow:hidden;margin-top:4px}
+.cubuk i{display:block;height:100%;border-radius:3px}
+.asim .halka .sayi{color:var(--kirmizi)}
+.uyari-bant{background:#3b1d1d;color:#fecaca;border-radius:12px;padding:10px 12px;font-size:14px;margin-top:12px;display:none}
+.asim .uyari-bant{display:block}
+.ekle-kutu{display:flex;gap:8px}
+.ekle-kutu input{flex:1}
+.ikon-tus{width:46px;height:46px;flex:none;border-radius:12px;background:var(--kart2);font-size:20px;display:flex;align-items:center;justify-content:center}
+.ikon-tus.ana{background:var(--yesil2);color:#052e16;font-weight:800}
+.araclar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.araclar button{background:var(--kart2);border-radius:12px;padding:10px 4px;font-size:12px;color:var(--soluk);display:flex;flex-direction:column;align-items:center;gap:3px}
+.araclar button span{font-size:20px}
+.oneriler{margin-top:8px;display:none;max-height:300px;overflow:auto;border-radius:12px;background:var(--kart2)}
+.oneriler.acik{display:block}
+.oneriler button{display:flex;width:100%;justify-content:space-between;gap:8px;padding:11px 12px;text-align:left;border-bottom:1px solid var(--cizgi);font-size:14px}
+.oneriler button small{color:var(--soluk)}
+.oneriler .ai{color:var(--yesil)}
+.cipler{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin-top:10px;scrollbar-width:none}
+.cipler::-webkit-scrollbar{display:none}
+.cip{flex:none;background:var(--kart2);border-radius:999px;padding:7px 12px;font-size:13px;white-space:nowrap}
+.cip small{color:var(--soluk)}
+.liste .oge{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--cizgi)}
+.liste .oge:last-child{border-bottom:0}
+.liste .oge .ad{flex:1;min-width:0}
+.liste .oge .ad div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.liste .oge .ad small{color:var(--soluk);font-size:12px}
+.liste .oge .kc{font-weight:700;white-space:nowrap}
+.bos{color:var(--soluk);font-size:14px;text-align:center;padding:12px 0}
+.su{display:flex;flex-wrap:wrap;gap:6px}
+.bardak{width:30px;height:38px;border-radius:4px 4px 9px 9px;border:2px solid var(--mavi);position:relative;overflow:hidden;opacity:.55}
+.bardak.dolu{opacity:1}
+.bardak.dolu::after{content:"";position:absolute;left:0;right:0;bottom:0;height:75%;background:var(--mavi)}
+.su-ust{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.su-ust button{background:var(--kart2);border-radius:10px;padding:4px 12px;font-size:18px}
+.seri{display:flex;align-items:center;gap:12px}
+.seri .alev{font-size:32px}
+.seri b{font-size:22px}
+.alt-menu{position:fixed;left:0;right:0;bottom:0;background:rgba(15,20,18,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--cizgi);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:5}
+.alt-menu button{flex:1;padding:6px 0;font-size:11px;color:var(--soluk);display:flex;flex-direction:column;align-items:center;gap:2px}
+.alt-menu button span{font-size:22px;filter:grayscale(1);opacity:.7}
+.alt-menu button.acik{color:var(--yesil)}
+.alt-menu button.acik span{filter:none;opacity:1}
+.perde{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10;display:none;align-items:flex-end;justify-content:center}
+.perde.acik{display:flex}
+.sayfa-alt{background:var(--kart);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;animation:yuksel .2s ease-out}
+@keyframes yuksel{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
+.sayfa-alt h3{margin:0 0 12px;font-size:18px}
+.kalem{background:var(--kart2);border-radius:14px;padding:12px;margin-bottom:10px}
+.kalem .bas{display:flex;gap:10px;align-items:center}
+.kalem .bas input[type=checkbox]{width:22px;height:22px;accent-color:var(--yesil2);flex:none}
+.kalem .bas .ad{flex:1;font-weight:600}
+.kalem .bas .ad small{display:block;color:var(--soluk);font-weight:400;font-size:12px}
+.kalem .alanlar{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1fr;gap:6px;margin-top:10px}
+.kalem .alanlar label{font-size:11px;color:var(--soluk)}
+.kalem .alanlar input{padding:8px 6px;font-size:14px;text-align:center}
+.carpan{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.carpan button{background:var(--kart);border-radius:8px;padding:5px 10px;font-size:13px}
+.carpan button.secili{background:var(--yesil2);color:#052e16;font-weight:700}
+.toplam{display:flex;justify-content:space-between;font-weight:700;margin:6px 0 10px;font-size:17px}
+.not{font-size:13px;color:var(--soluk);margin-bottom:10px}
+.uyari{background:#3b1d1d;color:#fecaca;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:10px}
+.bilgi{background:#16302a;color:#bbf7d0;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:10px}
+.tuslar{display:flex;gap:8px}
+.tus{flex:1;padding:13px;border-radius:14px;background:var(--kart2);font-weight:700;text-align:center}
+.tus.ana{background:var(--yesil2);color:#052e16}
+.tus.tehlike{background:#3b1d1d;color:#fecaca}
+.tus.kucuk{flex:none;padding:9px 14px;font-size:14px}
+.yukleniyor{display:flex;align-items:center;gap:10px;color:var(--soluk);padding:20px 0;justify-content:center}
+.donen{width:22px;height:22px;border:3px solid var(--cizgi);border-top-color:var(--yesil);border-radius:50%;animation:don 0.8s linear infinite}
+@keyframes don{to{transform:rotate(360deg)}}
+.form{display:grid;gap:12px}
+.form label{font-size:13px;color:var(--soluk);display:grid;gap:5px}
+.iki{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.anahtar-satir{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.anahtar-satir input{width:auto;width:22px;height:22px;accent-color:var(--yesil2)}
+.grafik{width:100%;height:auto;display:block}
+.istat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.istat div{background:var(--kart2);border-radius:12px;padding:10px 4px}
+.istat b{display:block;font-size:18px}
+.istat small{font-size:11px;color:var(--soluk)}
+.hafta-satir{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--cizgi);font-size:14px}
+.hafta-satir:last-child{border:0}
+.bildirim{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--kart2);border:1px solid var(--cizgi);padding:10px 16px;border-radius:12px;z-index:30;font-size:14px;max-width:90vw;display:none}
+.esle{max-width:400px;margin:15vh auto 0;padding:0 16px;text-align:center}
+.esle input{text-align:center;font-size:28px;letter-spacing:8px;margin:16px 0}
+#okuyucu{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:220px}
+.oneri-kart{background:var(--kart2);border-radius:14px;padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.oneri-kart div{flex:1}
+.oneri-kart small{color:var(--soluk);display:block}
+.senk{font-size:11px;color:var(--soluk);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div id="eslemeEkrani" class="esle" style="display:none">
+  <div style="font-size:54px">⚖️</div>
+  <h1 style="font-size:20px">SalimBabanınZayıflamaUygulaması</h1>
+  <p style="color:var(--soluk);font-size:14px">Bu cihaz henüz eşlenmemiş. Eşlenmiş cihazında <b>Ayarlar → Eşleme kodu al</b> deyip çıkan 6 haneli kodu buraya gir.</p>
+  <input id="eslemeKod" inputmode="numeric" maxlength="6" placeholder="000000">
+  <button class="tus ana" style="width:100%" onclick="kodlaEsle()">Eşle</button>
+</div>
+
+<div id="uygulama" style="display:none">
+
+<!-- BUGÜN -->
+<section class="sayfa acik" id="s-bugun">
+  <div class="ust">
+    <button onclick="gunDegis(-1)">‹</button>
+    <div class="tarih" id="tarihYazi">Bugün</div>
+    <button onclick="gunDegis(1)" id="ileriTus">›</button>
+  </div>
+
+  <div class="kart" id="ozetKart">
+    <div class="halka-kutu">
+      <div class="halka">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="var(--kart2)" stroke-width="13"/>
+          <circle id="halkaYay" cx="75" cy="75" r="64" fill="none" stroke="var(--yesil)" stroke-width="13" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402" style="transition:stroke-dashoffset .4s,stroke .3s"/>
+        </svg>
+        <div class="ic"><div class="sayi" id="kalanSayi">–</div><div class="alt" id="kalanAlt">kcal kaldı</div></div>
+      </div>
+      <div class="ozet">
+        <div class="satir"><span>Yenen</span><b id="yenenYazi">0</b></div>
+        <div class="satir"><span>Bugünkü sınır</span><b id="sinirYazi">0</b></div>
+        <div class="satir"><span>Haftalık kalan</span><b id="haftaYazi">0</b></div>
+        <div class="satir" style="color:var(--soluk);font-size:12px"><span id="sinirNot"></span></div>
+      </div>
+    </div>
+    <div class="makro">
+      <div class="m">Protein<b id="pY">0 / 0 g</b><div class="cubuk"><i id="pC" style="background:var(--mor)"></i></div></div>
+      <div class="m">Karb<b id="kY">0 / 0 g</b><div class="cubuk"><i id="kC" style="background:var(--sari)"></i></div></div>
+      <div class="m">Yağ<b id="yY">0 / 0 g</b><div class="cubuk"><i id="yC" style="background:var(--turuncu)"></i></div></div>
+    </div>
+    <div class="uyari-bant" id="asimYazi"></div>
+  </div>
+
+  <div class="kart">
+    <div class="ekle-kutu">
+      <input id="giris" placeholder="Ne yedin? (ya da direkt kalori: 450)" autocomplete="off" enterkeyhint="search">
+      <button class="ikon-tus ana" onclick="bul()" aria-label="Bul">➜</button>
+    </div>
+    <div class="oneriler" id="oneriListe"></div>
+    <div class="araclar">
+      <button onclick="sesle()"><span>🎤</span>Sesle</button>
+      <button onclick="document.getElementById('fotoGiris').click()"><span>📷</span>Fotoğraf</button>
+      <button onclick="barkodAc()"><span>🏷️</span>Barkod</button>
+      <button onclick="neYesem()"><span>💡</span>Ne yesem?</button>
+    </div>
+    <input type="file" id="fotoGiris" accept="image/*" capture="environment" style="display:none">
+    <div class="cipler" id="hizliCipler"></div>
+  </div>
+
+  <div class="kart">
+    <h2 id="listeBaslik">Bugün yediklerin</h2>
+    <div class="liste" id="liste"></div>
+  </div>
+
+  <div class="kart">
+    <div class="su-ust"><h2 style="margin:0">💧 Su <span id="suYazi" style="color:var(--yazi)"></span></h2>
+      <div><button onclick="suEkle(-250)">−</button> <button onclick="suEkle(250)">+</button></div></div>
+    <div class="su" id="suBardak"></div>
+  </div>
+
+  <div class="kart seri">
+    <div class="alev" id="seriAlev">🔥</div>
+    <div><b id="seriSayi">0 gün</b><div style="color:var(--soluk);font-size:13px" id="seriYazi">üst üste sınırın altında</div></div>
+  </div>
+  <div class="senk" id="senkYazi"></div>
+</section>
+
+<!-- KİLO -->
+<section class="sayfa" id="s-kilo">
+  <div class="kart">
+    <h2>Kilonu gir</h2>
+    <div class="ekle-kutu">
+      <input id="kiloGiris" inputmode="decimal" placeholder="ör. 107,4">
+      <button class="ikon-tus ana" onclick="kiloEkle()">＋</button>
+    </div>
+    <div style="font-size:12px;color:var(--soluk);margin-top:8px">En doğrusu: sabah, tuvaletten sonra, aç karnına.</div>
+  </div>
+  <div class="kart">
+    <h2>Gidişat</h2>
+    <div id="kiloGrafik"></div>
+  </div>
+  <div class="kart"><div class="istat" id="kiloIstat"></div></div>
+  <div class="kart"><h2>Tartılar</h2><div class="liste" id="kiloListe"></div></div>
+</section>
+
+<!-- HAFTA -->
+<section class="sayfa" id="s-hafta">
+  <div class="ust">
+    <button onclick="haftaDegis(-1)">‹</button>
+    <div class="tarih" id="haftaBaslik">Bu hafta</div>
+    <button onclick="haftaDegis(1)">›</button>
+  </div>
+  <div class="kart"><div id="haftaGrafik"></div></div>
+  <div class="kart"><div class="istat" id="haftaIstat"></div></div>
+  <div class="kart"><h2>Günler</h2><div id="haftaGunler"></div></div>
+</section>
+
+<!-- AYARLAR -->
+<section class="sayfa" id="s-ayar">
+  <div class="kart">
+    <h2>Hedefin</h2>
+    <div id="hedefOzet" style="font-size:14px;line-height:1.6"></div>
+  </div>
+  <div class="kart form">
+    <h2>Bilgilerin</h2>
+    <div class="iki">
+      <label>Cinsiyet<select id="aCins"><option value="e">Erkek</option><option value="k">Kadın</option></select></label>
+      <label>Yaş<input id="aYas" inputmode="numeric"></label>
+    </div>
+    <div class="iki">
+      <label>Boy (cm)<input id="aBoy" inputmode="numeric"></label>
+      <label>Hedef kilo (kg)<input id="aHedefKilo" inputmode="decimal" placeholder="isteğe bağlı"></label>
+    </div>
+    <label>Hareket<select id="aAktivite">
+      <option value="1.2">Masa başı</option><option value="1.375">Hafif hareketli (haftada 1-3 spor)</option>
+      <option value="1.55">Orta hareketli (haftada 3-5 spor)</option><option value="1.725">Çok hareketli</option></select></label>
+    <label>Hız<select id="aAcik">
+      <option value="300">Yavaş · haftada ~0,3 kg</option><option value="500">Orta · haftada ~0,5 kg</option>
+      <option value="750">Hızlı · haftada ~0,7 kg</option><option value="900">Hızlı+ · haftada ~0,8 kg</option>
+      <option value="1000">En hızlı · haftada ~0,9 kg</option></select></label>
+    <label>Elle kalori hedefi (boş = otomatik)<input id="aElle" inputmode="numeric" placeholder="otomatik"></label>
+    <label>Günlük su hedefi (ml)<input id="aSu" inputmode="numeric"></label>
+    <button class="tus ana" onclick="ayarKaydet()">Kaydet</button>
+  </div>
+  <div class="kart">
+    <h2>Bildirimler</h2>
+    <div class="anahtar-satir"><span>Akşam 21:00 hatırlatması</span><input type="checkbox" id="aAksam"></div>
+    <div class="anahtar-satir"><span>Pazartesi tartılma + haftalık özet</span><input type="checkbox" id="aTarti"></div>
+    <button class="tus" style="width:100%;margin-top:8px" onclick="bildirimAc()">Bu telefonda bildirimleri aç</button>
+    <div id="bildirimDurum" style="font-size:12px;color:var(--soluk);margin-top:8px"></div>
+  </div>
+  <div class="kart">
+    <h2>Diğer cihazlar</h2>
+    <div style="font-size:14px;color:var(--soluk);margin-bottom:10px">Ana ekrana eklediğin uygulamayı ya da bilgisayarı eşlemek için 10 dakikalık kod.</div>
+    <button class="tus" style="width:100%" onclick="kodAl()">Eşleme kodu al</button>
+    <div id="kodYazi" style="font-size:30px;letter-spacing:6px;text-align:center;margin-top:10px;font-weight:800"></div>
+  </div>
+  <div class="kart">
+    <h2>Yedek</h2>
+    <button class="tus" style="width:100%" onclick="yedekIndir()">Tüm kayıtları dosya olarak indir</button>
+    <div class="senk" id="surumYazi"></div>
+  </div>
+</section>
+
+<nav class="alt-menu">
+  <button class="acik" data-s="bugun"><span>🍽️</span>Bugün</button>
+  <button data-s="kilo"><span>⚖️</span>Kilo</button>
+  <button data-s="hafta"><span>📊</span>Hafta</button>
+  <button data-s="ayar"><span>⚙️</span>Ayarlar</button>
+</nav>
+</div>
+
+<div class="perde" id="perde"><div class="sayfa-alt" id="altSayfa"></div></div>
+<div class="bildirim" id="tost"></div>
+
+<script src="/yemekler.js"></script>
+<script>
+"use strict";
+// ---------- yardımcılar ----------
+const $ = (id) => document.getElementById(id);
+const sayi = (x) => Math.round(Number(x) || 0).toLocaleString("tr-TR");
+const kesir = (x) => (Math.round((Number(x) || 0) * 10) / 10).toLocaleString("tr-TR");
+const yeniId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const kacis = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const sayiOku = (s) => parseFloat(String(s).replace(",", "."));
+function guvenliOku(k) { try { return localStorage.getItem(k); } catch { return null; } }
+function guvenliYaz(k, v) { try { localStorage.setItem(k, v); } catch {} }
+function tost(m, sure = 2500) { const t = $("tost"); t.textContent = m; t.style.display = "block"; clearTimeout(tost.z); tost.z = setTimeout(() => (t.style.display = "none"), sure); }
+function gunAnahtari(d) { const t = new Date(d); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`; }
+function anahtardanTarih(g) { const [y, a, d] = g.split("-").map(Number); return new Date(y, a - 1, d, 12); }
+function gunEkle(g, n) { const t = anahtardanTarih(g); t.setDate(t.getDate() + n); return gunAnahtari(t); }
+function haftaBasi(g) { const t = anahtardanTarih(g); const gun = (t.getDay() + 6) % 7; t.setDate(t.getDate() - gun); return gunAnahtari(t); }
+const GUNLER = ["Pazar", "Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi"];
+const KISA = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+const AYLAR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+function tarihYaz(g) { const t = anahtardanTarih(g); return `${t.getDate()} ${AYLAR[t.getMonth()]} ${GUNLER[t.getDay()]}`; }
+function normal(s) { return String(s).toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ı/g, "i").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim(); }
+
+// ---------- anahtar ----------
+const url = new URL(location.href);
+let ANAHTAR = url.searchParams.get("k") || guvenliOku("kal.anahtar") || "";
+if (url.searchParams.get("k")) guvenliYaz("kal.anahtar", ANAHTAR);
+
+async function api(yol, govde, yontem) {
+  const secenek = { method: yontem || (govde ? "POST" : "GET"), headers: { "X-Anahtar": ANAHTAR } };
+  if (govde) { secenek.headers["Content-Type"] = "application/json"; secenek.body = JSON.stringify(govde); }
+  const y = await fetch(yol, secenek);
+  if (y.status === 401) { throw new Error("Eşleme anahtarı geçersiz"); }
+  let veri = null; try { veri = await y.json(); } catch {}
+  if (!y.ok) throw new Error((veri && veri.detail) || `Sunucu hatası (${y.status})`);
+  return veri;
+}
+
+async function kodlaEsle() {
+  const kod = $("eslemeKod").value.trim();
+  try {
+    const y = await fetch("/api/kod/kullan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kod }) });
+    const v = await y.json();
+    if (!y.ok) throw new Error(v.detail || "olmadı");
+    ANAHTAR = v.anahtar; guvenliYaz("kal.anahtar", ANAHTAR); location.replace("/?k=" + encodeURIComponent(ANAHTAR));
+  } catch (e) { tost("Eşlenemedi: " + e.message); }
+}
+
+// ---------- veri ----------
+const VARSAYILAN_AYAR = { cins: "e", yas: 30, boy: 175, aktivite: 1.375, acik: 900, elle: 0, su: 3000, hedefKilo: 0, aksamBildirim: true, tartiBildirim: true, d: 0 };
+let V = { kayit: {}, kilo: {}, su: {}, fav: {}, ayar: { ...VARSAYILAN_AYAR } };
+try { const s = JSON.parse(guvenliOku("kal.veri.v1") || "null"); if (s) V = { ...V, ...s, ayar: { ...VARSAYILAN_AYAR, ...(s.ayar || {}) } }; } catch {}
+function kaydetYerel() { guvenliYaz("kal.veri.v1", JSON.stringify(V)); }
+function degisti() { kaydetYerel(); ciz(); esitleBirazdan(); }
+
+function birlestirYerel(gelen) {
+  for (const k of ["kayit", "kilo", "su", "fav"]) {
+    for (const o of Object.values(gelen[k] || {})) {
+      if (!V[k][o.id] || (o.d || 0) > (V[k][o.id].d || 0)) V[k][o.id] = o;
+    }
+  }
+  if (gelen.ayar && (gelen.ayar.d || 0) > (V.ayar.d || 0)) V.ayar = { ...VARSAYILAN_AYAR, ...gelen.ayar };
+}
+let esitleZaman = null, esitleniyor = false;
+function esitleBirazdan() { clearTimeout(esitleZaman); esitleZaman = setTimeout(esitle, 800); }
+async function esitle() {
+  if (esitleniyor) return esitleBirazdan();
+  esitleniyor = true;
+  try {
+    const gelen = await api("/api/esitle", V);
+    birlestirYerel(gelen); kaydetYerel(); ciz();
+    $("senkYazi").textContent = "Sunucuya yedeklendi · " + new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  } catch (e) {
+    $("senkYazi").textContent = "Çevrimdışı — kayıtlar telefonda, bağlantı gelince yedeklenecek";
+    if (/anahtar/i.test(e.message)) { $("senkYazi").textContent = "Eşleme anahtarı geçersiz — Ayarlar'dan yeniden eşle"; }
+  } finally { esitleniyor = false; }
+}
+
+// ---------- hesaplar ----------
+const canli = (o) => !o.silindi;
+function kilolar() { return Object.values(V.kilo).filter(canli).sort((a, b) => a.t - b.t); }
+function sonKilo() { const k = kilolar(); return k.length ? k[k.length - 1].kg : 80; }
+function hedefler() {
+  const a = V.ayar, kg = sonKilo();
+  const bmr = 10 * kg + 6.25 * a.boy - 5 * a.yas + (a.cins === "k" ? -161 : 5);
+  const tdee = bmr * a.aktivite;
+  const taban = a.cins === "k" ? 1200 : 1500;
+  let kcal = a.elle > 0 ? a.elle : Math.max(taban, Math.round((tdee - a.acik) / 50) * 50);
+  const protein = Math.min(200, Math.round(kg * 1.5 / 5) * 5);
+  const yag = Math.round(kcal * 0.28 / 9);
+  const karb = Math.max(0, Math.round((kcal - protein * 4 - yag * 9) / 4));
+  return { bmr: Math.round(bmr), tdee: Math.round(tdee), kcal, protein, yag, karb, taban, kg };
+}
+function gununKayitlari(g) { return Object.values(V.kayit).filter((o) => canli(o) && gunAnahtari(o.t) === g).sort((a, b) => a.t - b.t); }
+function gunToplam(g) {
+  const t = { kcal: 0, protein: 0, karb: 0, yag: 0, adet: 0 };
+  for (const o of gununKayitlari(g)) { t.kcal += o.kcal || 0; t.protein += o.protein || 0; t.karb += o.karb || 0; t.yag += o.yag || 0; t.adet++; }
+  return t;
+}
+// Haftalık bütçe: haftanın geri kalan günlerine kalan bütçe eşit bölünür.
+// Fazla yediysen sınır düşer (ama sağlık tabanının altına inmez), az yediysen biraz artar.
+function gununSiniri(g) {
+  const h = hedefler();
+  const bas = haftaBasi(g);
+  let onceki = 0, gunNo = 0;
+  for (let i = 0; i < 7; i++) { const gg = gunEkle(bas, i); if (gg === g) { gunNo = i; break; } onceki += gunToplam(gg).kcal; }
+  // Kayıt girilmemiş geçmiş günler bütçeyi şişirmesin: o günler hedef kadar yenmiş sayılır
+  for (let i = 0; i < gunNo; i++) { const gg = gunEkle(bas, i); if (gunToplam(gg).adet === 0) onceki += h.kcal; }
+  const kalanHafta = h.kcal * 7 - onceki;
+  const kalanGun = 7 - gunNo;
+  const ham = kalanHafta / kalanGun;
+  const sinir = Math.round(Math.min(h.kcal + 400, Math.max(h.taban, ham)) / 10) * 10;
+  return { sinir, kalanHafta, ham: Math.round(ham), h };
+}
+function suMl(g) { const s = V.su[g]; return s && !s.silindi ? s.ml || 0 : 0; }
+function seri() {
+  let n = 0, g = gunEkle(gunAnahtari(Date.now()), -1);
+  for (let i = 0; i < 400; i++) {
+    const t = gunToplam(g);
+    if (t.adet === 0 || t.kcal > gununSiniri(g).sinir) break;
+    n++; g = gunEkle(g, -1);
+  }
+  const bugun = gunAnahtari(Date.now()), tb = gunToplam(bugun);
+  const bugunIyi = tb.adet > 0 && tb.kcal <= gununSiniri(bugun).sinir;
+  return { n, bugunIyi };
+}
+
+// ---------- çizim ----------
+let SECILI = gunAnahtari(Date.now());
+function gunDegis(n) { const yeni = gunEkle(SECILI, n); if (yeni > gunAnahtari(Date.now())) return; SECILI = yeni; ciz(); }
+
+function ciz() {
+  const bugun = gunAnahtari(Date.now());
+  const g = SECILI, t = gunToplam(g), { sinir, kalanHafta, h } = gununSiniri(g);
+  $("tarihYazi").textContent = g === bugun ? "Bugün" : g === gunEkle(bugun, -1) ? "Dün" : tarihYaz(g);
+  $("ileriTus").style.visibility = g === bugun ? "hidden" : "visible";
+  $("listeBaslik").textContent = g === bugun ? "Bugün yediklerin" : tarihYaz(g);
+  const kalan = sinir - t.kcal;
+  $("kalanSayi").textContent = sayi(Math.abs(kalan));
+  $("kalanAlt").textContent = kalan >= 0 ? "kcal kaldı" : "kcal aştın";
+  const oran = Math.min(1, t.kcal / sinir);
+  const yay = $("halkaYay");
+  yay.style.strokeDashoffset = String(402 * (1 - oran));
+  yay.style.stroke = kalan < 0 ? "var(--kirmizi)" : oran > 0.85 ? "var(--sari)" : "var(--yesil)";
+  $("ozetKart").classList.toggle("asim", kalan < 0);
+  $("asimYazi").textContent = kalan < 0 ? `Bugünkü sınırı ${sayi(-kalan)} kcal aştın. Bu fazlalık haftanın kalan günlerine bölünecek.` : "";
+  $("yenenYazi").textContent = sayi(t.kcal) + " kcal";
+  $("sinirYazi").textContent = sayi(sinir) + " kcal";
+  $("haftaYazi").textContent = sayi(kalanHafta - t.kcal) + " kcal";
+  $("sinirNot").textContent = sinir !== h.kcal ? `Normal hedef ${sayi(h.kcal)}; haftalık bütçeye göre ayarlandı` : `Günlük hedefin ${sayi(h.kcal)} kcal`;
+  const mak = (ad, yen, hed) => { $(ad + "Y").textContent = `${sayi(yen)} / ${hed} g`; $(ad + "C").style.width = Math.min(100, (yen / hed) * 100) + "%"; };
+  mak("p", t.protein, h.protein); mak("k", t.karb, h.karb); mak("y", t.yag, h.yag);
+
+  // liste
+  const kayitlar = gununKayitlari(g);
+  $("liste").innerHTML = kayitlar.length ? kayitlar.map((o) => `
+    <div class="oge" onclick="kayitAc('${o.id}')">
+      <div class="ad"><div>${favMi(o.ad) ? "⭐ " : ""}${kacis(o.ad)}</div><small>${new Date(o.t).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })} · ${kacis(o.miktar || "")}${o.protein ? ` · P ${kesir(o.protein)} K ${kesir(o.karb)} Y ${kesir(o.yag)}` : ""}</small></div>
+      <div class="kc">${sayi(o.kcal)}</div>
+    </div>`).join("") : `<div class="bos">Henüz bir şey girilmedi.</div>`;
+
+  // su
+  const ml = suMl(g), hedefSu = V.ayar.su || 3000, adet = Math.ceil(hedefSu / 250);
+  $("suYazi").textContent = `${(ml / 1000).toLocaleString("tr-TR")} / ${(hedefSu / 1000).toLocaleString("tr-TR")} L`;
+  $("suBardak").innerHTML = Array.from({ length: Math.max(adet, Math.ceil(ml / 250)) }, (_, i) => `<div class="bardak ${i < ml / 250 ? "dolu" : ""}" onclick="suAyarla(${(i + 1) * 250})"></div>`).join("");
+
+  // seri
+  const s = seri();
+  const toplamSeri = s.n + (s.bugunIyi ? 1 : 0);
+  $("seriSayi").textContent = `${toplamSeri} gün`;
+  $("seriAlev").style.filter = toplamSeri ? "none" : "grayscale(1)";
+  $("seriYazi").textContent = s.bugunIyi ? "üst üste sınırın altında (bugün dahil)" : toplamSeri ? "üst üste sınırın altında — bugünü de kurtar" : "sınırın altında kaldığın her gün seri büyür";
+
+  hizliCipler();
+  if ($("s-kilo").classList.contains("acik")) kiloCiz();
+  if ($("s-hafta").classList.contains("acik")) haftaCiz();
+  if ($("s-ayar").classList.contains("acik")) ayarCiz();
+}
+
+// ---------- favoriler ve hızlı ekle ----------
+function favMi(ad) { return Object.values(V.fav).some((f) => canli(f) && normal(f.ad) === normal(ad)); }
+function favDegistir(o) {
+  const var_ = Object.values(V.fav).find((f) => canli(f) && normal(f.ad) === normal(o.ad));
+  if (var_) { var_.silindi = true; var_.d = Date.now(); tost("Favorilerden çıkarıldı"); }
+  else { const id = yeniId(); V.fav[id] = { id, ad: o.ad, miktar: o.miktar || "", kcal: o.kcal, protein: o.protein || 0, karb: o.karb || 0, yag: o.yag || 0, d: Date.now() }; tost("⭐ Favorilere eklendi"); }
+  degisti();
+}
+function sikYenenler() {
+  const sayac = {};
+  const sinir = Date.now() - 30 * 86400000;
+  for (const o of Object.values(V.kayit)) {
+    if (!canli(o) || o.t < sinir || o.dogrudan) continue;
+    const k = normal(o.ad); (sayac[k] = sayac[k] || { o, n: 0 }).n++;
+    if (o.t > sayac[k].o.t) sayac[k].o = o;
+  }
+  return Object.values(sayac).sort((a, b) => b.n - a.n).map((x) => x.o);
+}
+function hizliCipler() {
+  const fav = Object.values(V.fav).filter(canli);
+  const gorulen = new Set(fav.map((f) => normal(f.ad)));
+  const sik = sikYenenler().filter((o) => !gorulen.has(normal(o.ad))).slice(0, 8);
+  const dun = gununKayitlari(gunEkle(SECILI, -1));
+  const parca = fav.map((f) => `<button class="cip" onclick="hizliEkle('fav','${f.id}')">⭐ ${kacis(f.ad)} <small>${sayi(f.kcal)}</small></button>`)
+    .concat(sik.map((o) => `<button class="cip" onclick="hizliEkle('kayit','${o.id}')">${kacis(o.ad)} <small>${sayi(o.kcal)}</small></button>`));
+  if (dun.length) parca.unshift(`<button class="cip" onclick="dunuTekrarla()">↺ Dünküleri tekrarla <small>${sayi(dun.reduce((t, o) => t + o.kcal, 0))}</small></button>`);
+  $("hizliCipler").innerHTML = parca.join("");
+  $("hizliCipler").style.display = parca.length ? "flex" : "none";
+}
+function hizliEkle(tur, id) {
+  const o = V[tur][id]; if (!o) return;
+  onayAc([{ ad: o.ad, miktar: o.miktar || "", kcal: o.kcal, protein: o.protein || 0, karb: o.karb || 0, yag: o.yag || 0 }], "favori/geçmiş");
+}
+function dunuTekrarla() {
+  const dun = gununKayitlari(gunEkle(SECILI, -1));
+  onayAc(dun.map((o) => ({ ad: o.ad, miktar: o.miktar || "", kcal: o.kcal, protein: o.protein || 0, karb: o.karb || 0, yag: o.yag || 0 })), "dün");
+}
+
+// ---------- arama / öneri listesi ----------
+const DB = (window.YEMEKLER || []).map(([ad, miktar, kcal, protein, karb, yag]) => ({ ad, miktar, kcal, protein, karb, yag, n: normal(ad) }));
+function eslesenler(q) {
+  const nq = normal(q); if (nq.length < 2) return [];
+  const kelimeler = nq.split(" ");
+  const puan = (n) => { let p = 0; for (const k of kelimeler) { if (!n.includes(k)) return -1; p += n.startsWith(k) ? 3 : n.includes(" " + k) ? 2 : 1; } return p; };
+  const havuz = [];
+  const gorulen = new Set();
+  const ekle = (o, kaynak, bonus) => { const n = normal(o.ad); if (gorulen.has(n)) return; const p = puan(n); if (p < 0) return; gorulen.add(n); havuz.push({ o, kaynak, p: p + bonus }); };
+  Object.values(V.fav).filter(canli).forEach((o) => ekle(o, "⭐", 5));
+  sikYenenler().forEach((o) => ekle(o, "↺", 3));
+  DB.forEach((o) => ekle(o, "", 0));
+  return havuz.sort((a, b) => b.p - a.p).slice(0, 8);
+}
+let SON_ESLESME = [];
+$("giris").addEventListener("input", () => {
+  const q = $("giris").value.trim();
+  const kutu = $("oneriListe");
+  if (!q) { kutu.classList.remove("acik"); return; }
+  if (/^\d{2,4}$/.test(q)) {
+    kutu.innerHTML = `<button onclick="direktKalori()"><span>✍️ <b>${q} kcal</b> olarak ekle</span><small>direkt kalori</small></button>`;
+    kutu.classList.add("acik"); return;
+  }
+  SON_ESLESME = eslesenler(q);
+  kutu.innerHTML = SON_ESLESME.map((x, i) => `<button onclick="eslesmeSec(${i})"><span>${x.kaynak} ${kacis(x.o.ad)} <small>${kacis(x.o.miktar || "")}</small></span><small>${sayi(x.o.kcal)} kcal</small></button>`).join("")
+    + `<button class="ai" onclick="bul()"><span>🤖 “${kacis(q)}” için yapay zekaya sor</span><small>miktarı da yaz</small></button>`;
+  kutu.classList.add("acik");
+});
+$("giris").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); bul(); } });
+function girisTemizle() { $("giris").value = ""; $("oneriListe").classList.remove("acik"); $("giris").blur(); }
+function eslesmeSec(i) {
+  const x = SON_ESLESME[i]; if (!x) return;
+  girisTemizle();
+  onayAc([{ ad: x.o.ad, miktar: x.o.miktar || "", kcal: x.o.kcal, protein: x.o.protein || 0, karb: x.o.karb || 0, yag: x.o.yag || 0 }], x.kaynak === "" ? "hazır liste" : "favori/geçmiş");
+}
+function direktKalori() {
+  const k = parseInt($("giris").value, 10); if (!k) return;
+  girisTemizle();
+  onayAc([{ ad: "Kalori girişi", miktar: "elle", kcal: k, protein: 0, karb: 0, yag: 0, dogrudan: true }], "elle");
+}
+
+async function bul(metin) {
+  const q = (metin ?? $("giris").value).trim(); if (!q) { $("giris").focus(); return; }
+  if (/^\d{2,4}$/.test(q)) return direktKalori();
+  // Hazır listede birebir varsa yapay zekaya gitme
+  const nq = normal(q);
+  const birebir = DB.find((o) => o.n === nq) || Object.values(V.fav).find((o) => canli(o) && normal(o.ad) === nq);
+  girisTemizle();
+  if (birebir) return onayAc([{ ad: birebir.ad, miktar: birebir.miktar || "", kcal: birebir.kcal, protein: birebir.protein || 0, karb: birebir.karb || 0, yag: birebir.yag || 0 }], "hazır liste");
+  yukleniyorAc(`“${q}” hesaplanıyor…`);
+  try {
+    const v = await api("/api/tahmin", { metin: q });
+    if (!v.kalemler.length) throw new Error("bir şey bulunamadı");
+    onayAc(v.kalemler, v.kaynak, v.not);
+  } catch (e) { kapat(); tost("Bulunamadı: " + e.message, 4000); $("giris").value = q; }
+}
+
+// ---------- onay sayfası ----------
+let ONAY = [];
+function yukleniyorAc(m) { $("altSayfa").innerHTML = `<div class="yukleniyor"><div class="donen"></div>${kacis(m)}</div>`; $("perde").classList.add("acik"); }
+function kapat() { $("perde").classList.remove("acik"); if (window.okuyucu) { try { window.okuyucu.stop(); } catch {} window.okuyucu = null; } }
+$("perde").addEventListener("click", (e) => { if (e.target === $("perde")) kapat(); });
+
+function onayAc(kalemler, kaynak, not) {
+  ONAY = kalemler.map((k) => ({ ...k, sec: true, carpan: 1, taban: { kcal: k.kcal, protein: k.protein, karb: k.karb, yag: k.yag } }));
+  onayCiz(kaynak, not);
+}
+function onayCiz(kaynak, not) {
+  if (kaynak !== undefined) { onayCiz.kaynak = kaynak; onayCiz.not = not; }
+  const html = ONAY.map((k, i) => `
+    <div class="kalem">
+      <div class="bas"><input type="checkbox" ${k.sec ? "checked" : ""} onchange="ONAY[${i}].sec=this.checked;onayToplam()">
+        <div class="ad">${kacis(k.ad)}<small>${kacis(k.miktar || "")}</small></div></div>
+      <div class="carpan">${[0.5, 1, 1.5, 2, 3].map((c) => `<button class="${k.carpan === c ? "secili" : ""}" onclick="carpanSec(${i},${c})">${c === 0.5 ? "½" : c === 1.5 ? "1½" : c}×</button>`).join("")}</div>
+      <div class="alanlar">
+        <label>kcal<input inputmode="numeric" value="${Math.round(k.kcal)}" oninput="alanDegis(${i},'kcal',this.value)"></label>
+        <label>Protein<input inputmode="decimal" value="${kesir(k.protein)}" oninput="alanDegis(${i},'protein',this.value)"></label>
+        <label>Karb<input inputmode="decimal" value="${kesir(k.karb)}" oninput="alanDegis(${i},'karb',this.value)"></label>
+        <label>Yağ<input inputmode="decimal" value="${kesir(k.yag)}" oninput="alanDegis(${i},'yag',this.value)"></label>
+        <label>&nbsp;<button class="tus kucuk" style="padding:8px 0;width:100%" onclick="favDegistir(ONAY[${i}]);onayCiz()">${favMi(k.ad) ? "⭐" : "☆"}</button></label>
+      </div>
+    </div>`).join("");
+  $("altSayfa").innerHTML = `
+    <h3>Eklenecekler</h3>
+    ${onayCiz.not ? `<div class="not">ℹ️ ${kacis(onayCiz.not)}</div>` : ""}
+    ${html}
+    <div class="not">Kaynak: ${kacis(onayCiz.kaynak || "")} · değerler tahmindir, gerekirse düzelt.</div>
+    <div class="toplam"><span>Toplam</span><span id="onayToplam"></span></div>
+    <div id="onayUyari"></div>
+    <div class="tuslar"><button class="tus" onclick="kapat()">Vazgeç</button><button class="tus ana" id="onayTus" onclick="onayEkle()">Ekle</button></div>`;
+  $("perde").classList.add("acik");
+  onayToplam();
+}
+function carpanSec(i, c) {
+  const k = ONAY[i]; k.carpan = c;
+  for (const a of ["kcal", "protein", "karb", "yag"]) k[a] = Math.round(k.taban[a] * c * 10) / 10;
+  onayCiz();
+}
+function alanDegis(i, a, v) { const n = sayiOku(v); ONAY[i][a] = isNaN(n) ? 0 : n; ONAY[i].taban[a] = ONAY[i][a] / ONAY[i].carpan; onayToplam(); }
+function onayToplam() {
+  const sec = ONAY.filter((k) => k.sec);
+  const top = sec.reduce((t, k) => t + (Number(k.kcal) || 0), 0);
+  $("onayToplam").textContent = sayi(top) + " kcal";
+  const { sinir, kalanHafta } = gununSiniri(SECILI);
+  const yenen = gunToplam(SECILI).kcal;
+  const sonra = yenen + top, asim = sonra - sinir;
+  const haftaSonra = kalanHafta - sonra;
+  let u = "";
+  if (top > 0 && asim > 0) {
+    u = `<div class="uyari">⚠️ Bunu eklersen bugünkü sınırı <b>${sayi(asim)} kcal</b> aşıyorsun.<br>${haftaSonra >= 0 ? `Haftalık bütçende ${sayi(haftaSonra)} kcal kalır; fazlası haftanın kalanına bölünür.` : `Haftalık bütçeyi de ${sayi(-haftaSonra)} kcal aşmış olursun.`}</div>`;
+    $("onayTus").textContent = "Yine de ekle";
+  } else if (top > 0) {
+    u = `<div class="bilgi">Ekledikten sonra bugün <b>${sayi(sinir - sonra)} kcal</b> hakkın kalır.</div>`;
+    $("onayTus").textContent = "Ekle";
+  }
+  $("onayUyari").innerHTML = u;
+}
+function onayEkle() {
+  const bugun = gunAnahtari(Date.now());
+  const t = SECILI === bugun ? Date.now() : anahtardanTarih(SECILI).getTime() + 8 * 3600000; // geçmiş gün → 20:00
+  let n = 0;
+  for (const k of ONAY.filter((k) => k.sec)) {
+    const id = yeniId();
+    const miktar = k.carpan !== 1 ? `${k.carpan.toLocaleString("tr-TR")} × ${k.miktar || "porsiyon"}` : k.miktar || "";
+    V.kayit[id] = { id, t: t + n, ad: k.ad, miktar, kcal: Math.round(Number(k.kcal) || 0), protein: +k.protein || 0, karb: +k.karb || 0, yag: +k.yag || 0, d: Date.now(), ...(k.dogrudan ? { dogrudan: true } : {}) };
+    n++;
+  }
+  kapat(); degisti();
+  if (n) tost(`${n} kalem eklendi`);
+}
+
+// ---------- kayıt düzenleme ----------
+function kayitAc(id) {
+  const o = V.kayit[id]; if (!o) return;
+  $("altSayfa").innerHTML = `
+    <h3>Düzenle</h3>
+    <div class="form">
+      <label>Ad<input id="dAd" value="${kacis(o.ad)}"></label>
+      <label>Miktar<input id="dMiktar" value="${kacis(o.miktar || "")}"></label>
+      <div class="iki"><label>kcal<input id="dKcal" inputmode="numeric" value="${o.kcal}"></label><label>Protein (g)<input id="dP" inputmode="decimal" value="${kesir(o.protein)}"></label></div>
+      <div class="iki"><label>Karb (g)<input id="dK" inputmode="decimal" value="${kesir(o.karb)}"></label><label>Yağ (g)<input id="dY" inputmode="decimal" value="${kesir(o.yag)}"></label></div>
+      <div class="tuslar"><button class="tus" onclick="favDegistir(V.kayit['${id}']);kapat()">${favMi(o.ad) ? "⭐ Favoriden çıkar" : "☆ Favorilere ekle"}</button><button class="tus" onclick="kopyala('${id}')">＋ Bir daha ekle</button></div>
+      <div class="tuslar"><button class="tus tehlike" onclick="kayitSil('${id}')">Sil</button><button class="tus ana" onclick="kayitKaydet('${id}')">Kaydet</button></div>
+    </div>`;
+  $("perde").classList.add("acik");
+}
+function kayitKaydet(id) {
+  const o = V.kayit[id];
+  Object.assign(o, { ad: $("dAd").value.trim() || o.ad, miktar: $("dMiktar").value.trim(), kcal: Math.round(sayiOku($("dKcal").value) || 0), protein: sayiOku($("dP").value) || 0, karb: sayiOku($("dK").value) || 0, yag: sayiOku($("dY").value) || 0, d: Date.now() });
+  kapat(); degisti();
+}
+function kayitSil(id) { const o = V.kayit[id]; o.silindi = true; o.d = Date.now(); kapat(); degisti(); tost("Silindi"); }
+function kopyala(id) { const o = V.kayit[id]; onayAc([{ ad: o.ad, miktar: o.miktar, kcal: o.kcal, protein: o.protein, karb: o.karb, yag: o.yag }], "kopya"); }
+
+// ---------- su ----------
+function suAyarla(ml) {
+  const g = SECILI, mevcut = suMl(g);
+  const yeni = mevcut === ml ? ml - 250 : ml;
+  V.su[g] = { id: g, ml: Math.max(0, yeni), d: Date.now() }; degisti();
+}
+function suEkle(ml) { suAyarla(Math.max(0, suMl(SECILI) + ml)); }
+
+// ---------- ses ----------
+function sesle() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { $("giris").focus(); tost("Klavyedeki 🎤 tuşuna basıp söyle, sonra ➜'ye bas", 4000); return; }
+  const r = new SR(); r.lang = "tr-TR"; r.interimResults = true; r.continuous = false;
+  let son = "";
+  yukleniyorAc("Dinliyorum… ne yediğini söyle (ör. iki yumurta bir dilim ekmek)");
+  $("altSayfa").insertAdjacentHTML("beforeend", `<div id="sesMetin" style="text-align:center;font-size:18px;min-height:30px"></div><button class="tus" style="width:100%;margin-top:10px" onclick="window.sesTanima&&window.sesTanima.stop()">Bitti</button>`);
+  window.sesTanima = r;
+  r.onresult = (e) => { son = Array.from(e.results).map((x) => x[0].transcript).join(" "); const m = $("sesMetin"); if (m) m.textContent = son; };
+  r.onerror = (e) => { kapat(); tost(e.error === "not-allowed" ? "Mikrofon izni verilmedi" : "Duyamadım, tekrar dene"); };
+  r.onend = () => { window.sesTanima = null; if (son.trim()) bul(son); else kapat(); };
+  try { r.start(); } catch { kapat(); $("giris").focus(); }
+}
+
+// ---------- fotoğraf ----------
+$("fotoGiris").addEventListener("change", async (e) => {
+  const dosya = e.target.files[0]; e.target.value = ""; if (!dosya) return;
+  yukleniyorAc("Tabağa bakıyorum…");
+  try {
+    const resim = await kucult(dosya, 1024);
+    const v = await api("/api/foto", { resim });
+    if (!v.kalemler.length) throw new Error("tabakta yiyecek göremedim");
+    onayAc(v.kalemler, "fotoğraf", v.not);
+  } catch (err) { kapat(); tost("Olmadı: " + err.message, 4000); }
+});
+function kucult(dosya, boy) {
+  return new Promise((coz, red) => {
+    const img = new Image();
+    img.onload = () => {
+      const o = Math.min(1, boy / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = Math.round(img.width * o); c.height = Math.round(img.height * o);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(img.src); coz(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => red(new Error("resim okunamadı"));
+    img.src = URL.createObjectURL(dosya);
+  });
+}
+
+// ---------- barkod ----------
+function betikYukle(src) { return new Promise((coz, red) => { if (window.Html5Qrcode) return coz(); const s = document.createElement("script"); s.src = src; s.onload = coz; s.onerror = () => red(new Error("okuyucu yüklenemedi")); document.head.appendChild(s); }); }
+async function barkodAc() {
+  $("altSayfa").innerHTML = `<h3>Barkodu kameraya göster</h3><div id="okuyucu"></div>
+    <div class="ekle-kutu" style="margin-top:10px"><input id="barkodElle" inputmode="numeric" placeholder="ya da numarayı yaz"><button class="ikon-tus ana" onclick="barkodBul($('barkodElle').value)">➜</button></div>
+    <button class="tus" style="width:100%;margin-top:10px" onclick="kapat()">Kapat</button>`;
+  $("perde").classList.add("acik");
+  try {
+    await betikYukle("https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js");
+    const ok = new Html5Qrcode("okuyucu", { formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E], verbose: false });
+    window.okuyucu = ok;
+    await ok.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 260, height: 140 } }, (kod) => { try { ok.stop(); } catch {} window.okuyucu = null; barkodBul(kod); }, () => {});
+  } catch (e) { const d = $("okuyucu"); if (d) d.innerHTML = `<div class="bos" style="padding:40px 10px">Kamera açılamadı (${kacis(e.message || e)}). Numarayı aşağıya yazabilirsin.</div>`; }
+}
+async function barkodBul(kod) {
+  kod = String(kod || "").replace(/\D/g, ""); if (kod.length < 6) return tost("Barkod numarası eksik");
+  if (window.okuyucu) { try { await window.okuyucu.stop(); } catch {} window.okuyucu = null; }
+  yukleniyorAc("Ürün aranıyor…");
+  try {
+    const u = await api("/api/barkod/" + kod);
+    const varsayilanG = u.porsiyon_g || parseFloat(u.paket) || 100;
+    $("altSayfa").innerHTML = `<h3>${kacis(u.ad)}</h3>
+      <div class="not">100 g'da ${sayi(u.yuz.kcal)} kcal · P ${kesir(u.yuz.protein)} · K ${kesir(u.yuz.karb)} · Y ${kesir(u.yuz.yag)}${u.paket ? ` · paket: ${kacis(u.paket)}` : ""}${u.porsiyon ? ` · porsiyon: ${kacis(u.porsiyon)}` : ""}</div>
+      <label style="font-size:13px;color:var(--soluk)">Kaç gram yedin?<input id="barkodGram" inputmode="decimal" value="${Math.round(varsayilanG)}"></label>
+      <div class="tuslar" style="margin-top:12px"><button class="tus" onclick="kapat()">Vazgeç</button><button class="tus ana" id="barkodDevam">Devam</button></div>`;
+    $("barkodDevam").onclick = () => {
+      const g = sayiOku($("barkodGram").value) || 0, o = g / 100;
+      onayAc([{ ad: u.ad, miktar: `${Math.round(g)} g`, kcal: Math.round(u.yuz.kcal * o), protein: u.yuz.protein * o, karb: u.yuz.karb * o, yag: u.yuz.yag * o }], "barkod (Open Food Facts)");
+    };
+  } catch (e) { kapat(); tost("Ürün bulunamadı. Adını yazıp yapay zekaya sorabilirsin.", 4000); }
+}
+
+// ---------- ne yesem ----------
+async function neYesem() {
+  const g = gunAnahtari(Date.now()), t = gunToplam(g), { sinir, h } = gununSiniri(g);
+  const kalan = sinir - t.kcal;
+  yukleniyorAc(`${sayi(Math.max(0, kalan))} kcal ile neler yiyebileceğine bakıyorum…`);
+  try {
+    const v = await api("/api/oneri", { kalan: Math.round(kalan), protein: Math.max(0, Math.round(h.protein - t.protein)), saat: new Date().toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" }), yenenler: gununKayitlari(g).map((o) => o.ad).join(", ") });
+    window.ONERILER = v.oneriler;
+    $("altSayfa").innerHTML = `<h3>💡 ${kalan > 0 ? `${sayi(kalan)} kcal kaldı` : "Bugünkü hakkın doldu"}</h3>
+      ${kalan <= 150 ? `<div class="uyari">Hakkın neredeyse bitti. Acıktıysan su, çay ya da salatalık en iyisi.</div>` : ""}
+      ${v.oneriler.map((o, i) => `<div class="oneri-kart"><div><b>${kacis(o.ad)}</b><small>${kacis(o.miktar)} · ${sayi(o.kcal)} kcal · ${kesir(o.protein)} g protein</small><small>${kacis(o.neden)}</small></div><button class="tus kucuk ana" onclick="oneriEkle(${i})">Ekle</button></div>`).join("")}
+      <div class="tuslar" style="margin-top:6px"><button class="tus" onclick="kapat()">Kapat</button><button class="tus" onclick="neYesem()">Başka öner</button></div>`;
+  } catch (e) { kapat(); tost("Öneri alınamadı: " + e.message, 4000); }
+}
+function oneriEkle(i) { const o = window.ONERILER[i]; onayAc([{ ad: o.ad, miktar: o.miktar, kcal: o.kcal, protein: o.protein, karb: o.karb, yag: o.yag }], "öneri"); }
+
+// ---------- kilo ----------
+function kiloEkle() {
+  const kg = sayiOku($("kiloGiris").value);
+  if (!(kg > 30 && kg < 300)) return tost("Geçerli bir kilo yaz");
+  const g = gunAnahtari(Date.now());
+  const id = "k-" + g; // günde bir tartı; aynı gün yeniden girersen üzerine yazar
+  V.kilo[id] = { id, t: Date.now(), kg: Math.round(kg * 10) / 10, d: Date.now() };
+  $("kiloGiris").value = ""; degisti(); tost("Kaydedildi. Hedefin yeni kiloya göre güncellendi.");
+}
+function kiloSil(id) { V.kilo[id].silindi = true; V.kilo[id].d = Date.now(); degisti(); }
+function kiloCiz() {
+  const k = kilolar();
+  const h = hedefler();
+  const W = 340, H = 190, P = 30;
+  if (k.length < 2) {
+    $("kiloGrafik").innerHTML = `<div class="bos">Grafik için en az iki tartı lazım. ${k.length ? `Şu an: <b>${kesir(k[0].kg)} kg</b>` : ""}</div>`;
+  } else {
+    const t0 = k[0].t, t1 = Math.max(k[k.length - 1].t, t0 + 86400000);
+    const kgs = k.map((x) => x.kg).concat(V.ayar.hedefKilo ? [] : []);
+    let lo = Math.min(...kgs) - 1, hi = Math.max(...kgs) + 1;
+    const X = (t) => P + ((t - t0) / (t1 - t0)) * (W - P - 10), Y = (v) => 10 + ((hi - v) / (hi - lo)) * (H - 30);
+    // 7 günlük ortalama
+    const ort = k.map((x) => { const p = k.filter((y) => y.t <= x.t && y.t > x.t - 7 * 86400000); return { t: x.t, kg: p.reduce((a, b) => a + b.kg, 0) / p.length }; });
+    const cizgi = (dizi) => dizi.map((x, i) => `${i ? "L" : "M"}${X(x.t).toFixed(1)},${Y(x.kg).toFixed(1)}`).join("");
+    const izgara = [lo, (lo + hi) / 2, hi].map((v) => `<line x1="${P}" x2="${W - 10}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--cizgi)"/><text x="${P - 4}" y="${Y(v) + 4}" fill="var(--soluk)" font-size="10" text-anchor="end">${v.toFixed(0)}</text>`).join("");
+    $("kiloGrafik").innerHTML = `<svg class="grafik" viewBox="0 0 ${W} ${H}">${izgara}
+      <path d="${cizgi(k)}" fill="none" stroke="var(--soluk)" stroke-width="1" stroke-dasharray="3 3"/>
+      <path d="${cizgi(ort)}" fill="none" stroke="var(--yesil)" stroke-width="3" stroke-linecap="round"/>
+      ${k.map((x) => `<circle cx="${X(x.t)}" cy="${Y(x.kg)}" r="3" fill="var(--yesil)"/>`).join("")}
+      <text x="${P}" y="${H - 4}" fill="var(--soluk)" font-size="10">${new Date(t0).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}</text>
+      <text x="${W - 10}" y="${H - 4}" fill="var(--soluk)" font-size="10" text-anchor="end">${new Date(t1).toLocaleDateString("tr-TR", { day: "numeric", month: "short" })}</text>
+    </svg><div style="font-size:12px;color:var(--soluk)">Yeşil çizgi: 7 günlük ortalama (günlük su dalgalanmasını yumuşatır)</div>`;
+  }
+  const ilk = k.length ? k[0].kg : h.kg, son = h.kg;
+  const verilen = ilk - son;
+  const bmi = son / Math.pow(V.ayar.boy / 100, 2);
+  let hedefYazi = "–";
+  if (V.ayar.hedefKilo && son > V.ayar.hedefKilo) {
+    const haftalik = (V.ayar.acik * 7) / 7700;
+    const hafta = (son - V.ayar.hedefKilo) / haftalik;
+    const tarih = new Date(Date.now() + hafta * 7 * 86400000);
+    hedefYazi = tarih.toLocaleDateString("tr-TR", { month: "short", year: "numeric" });
+  }
+  $("kiloIstat").innerHTML = `<div><b>${kesir(son)}</b><small>şimdi (kg)</small></div><div><b style="color:${verilen > 0 ? "var(--yesil)" : "var(--yazi)"}">${verilen > 0 ? "−" : ""}${kesir(Math.abs(verilen))}</b><small>toplam (kg)</small></div><div><b>${kesir(bmi)}</b><small>vücut kitle end.</small></div>
+    <div><b>${kesir(ilk)}</b><small>başlangıç</small></div><div><b>${V.ayar.hedefKilo ? kesir(V.ayar.hedefKilo) : "–"}</b><small>hedef kilo</small></div><div><b style="font-size:15px">${hedefYazi}</b><small>tahmini varış</small></div>`;
+  $("kiloListe").innerHTML = k.length ? k.slice().reverse().slice(0, 30).map((x) => `<div class="oge"><div class="ad"><div>${new Date(x.t).toLocaleDateString("tr-TR", { day: "numeric", month: "long", weekday: "short" })}</div></div><div class="kc">${kesir(x.kg)} kg</div><button onclick="kiloSil('${x.id}')" style="color:var(--soluk);padding:0 6px">✕</button></div>`).join("") : `<div class="bos">Henüz tartı yok</div>`;
+}
+
+// ---------- hafta ----------
+let HAFTA_KAYMA = 0;
+function haftaDegis(n) { HAFTA_KAYMA = Math.min(0, HAFTA_KAYMA + n); haftaCiz(); }
+function haftaCiz() {
+  const bugun = gunAnahtari(Date.now());
+  const bas = gunEkle(haftaBasi(bugun), HAFTA_KAYMA * 7);
+  const h = hedefler();
+  $("haftaBaslik").textContent = HAFTA_KAYMA === 0 ? "Bu hafta" : HAFTA_KAYMA === -1 ? "Geçen hafta" : `${tarihYaz(bas).split(" ").slice(0, 2).join(" ")} haftası`;
+  const gunler = Array.from({ length: 7 }, (_, i) => { const g = gunEkle(bas, i); return { g, t: gunToplam(g), s: gununSiniri(g).sinir, su: suMl(g), gelecek: g > bugun }; });
+  const enCok = Math.max(h.kcal + 400, ...gunler.map((x) => x.t.kcal));
+  const W = 340, H = 180, alt = 22, gen = (W - 20) / 7;
+  const Y = (v) => H - alt - (v / enCok) * (H - alt - 10);
+  const cubuklar = gunler.map((x, i) => {
+    const renk = x.t.adet === 0 ? "var(--kart2)" : x.t.kcal > x.s ? "var(--kirmizi)" : "var(--yesil)";
+    const yuk = Math.max(2, H - alt - Y(x.t.kcal));
+    return `<rect x="${10 + i * gen + 6}" y="${H - alt - yuk}" width="${gen - 12}" height="${yuk}" rx="5" fill="${renk}" opacity="${x.gelecek ? 0.3 : 1}"/>
+      <text x="${10 + i * gen + gen / 2}" y="${H - 6}" fill="${x.g === bugun ? "var(--yazi)" : "var(--soluk)"}" font-size="11" text-anchor="middle">${KISA[i]}</text>
+      ${x.t.adet ? `<text x="${10 + i * gen + gen / 2}" y="${H - alt - yuk - 4}" fill="var(--soluk)" font-size="9" text-anchor="middle">${Math.round(x.t.kcal)}</text>` : ""}`;
+  }).join("");
+  $("haftaGrafik").innerHTML = `<svg class="grafik" viewBox="0 0 ${W} ${H}">
+    <line x1="10" x2="${W - 10}" y1="${Y(h.kcal)}" y2="${Y(h.kcal)}" stroke="var(--sari)" stroke-dasharray="4 4"/>
+    <text x="${W - 12}" y="${Y(h.kcal) - 4}" fill="var(--sari)" font-size="10" text-anchor="end">hedef ${h.kcal}</text>${cubuklar}</svg>`;
+  const dolu = gunler.filter((x) => x.t.adet > 0);
+  const ort = (a) => (dolu.length ? dolu.reduce((s, x) => s + x.t[a], 0) / dolu.length : 0);
+  const hedefte = dolu.filter((x) => x.t.kcal <= x.s).length;
+  const toplam = gunler.reduce((s, x) => s + x.t.kcal, 0);
+  const tahminiKg = dolu.length ? ((h.tdee * dolu.length - dolu.reduce((s, x) => s + x.t.kcal, 0)) / 7700) : 0;
+  $("haftaIstat").innerHTML = `<div><b>${sayi(ort("kcal"))}</b><small>ort. kcal</small></div><div><b>${hedefte}/${dolu.length}</b><small>gün hedefte</small></div><div><b>${sayi(toplam)}</b><small>/ ${sayi(h.kcal * 7)} bütçe</small></div>
+    <div><b>${sayi(ort("protein"))} g</b><small>ort. protein</small></div><div><b>${(dolu.length ? gunler.reduce((s, x) => s + x.su, 0) / 7 / 1000 : 0).toLocaleString("tr-TR", { maximumFractionDigits: 1 })} L</b><small>ort. su</small></div><div><b style="color:var(--yesil)">${tahminiKg > 0 ? "−" : ""}${kesir(Math.abs(tahminiKg))}</b><small>tahmini kg</small></div>`;
+  $("haftaGunler").innerHTML = gunler.filter((x) => !x.gelecek).map((x) => `<div class="hafta-satir"><span>${tarihYaz(x.g)}</span><span style="color:${x.t.adet === 0 ? "var(--soluk)" : x.t.kcal > x.s ? "var(--kirmizi)" : "var(--yesil)"}">${x.t.adet ? `${sayi(x.t.kcal)} / ${sayi(x.s)}` : "girilmedi"}</span></div>`).join("");
+}
+
+// ---------- ayarlar ----------
+function ayarCiz() {
+  const a = V.ayar, h = hedefler();
+  $("aCins").value = a.cins; $("aYas").value = a.yas; $("aBoy").value = a.boy; $("aHedefKilo").value = a.hedefKilo || "";
+  $("aAktivite").value = String(a.aktivite); $("aAcik").value = String(a.acik); $("aElle").value = a.elle || ""; $("aSu").value = a.su;
+  $("aAksam").checked = a.aksamBildirim !== false; $("aTarti").checked = a.tartiBildirim !== false;
+  $("hedefOzet").innerHTML = `Şu anki kilon <b>${kesir(h.kg)} kg</b>. Dinlenirken yaktığın: <b>${sayi(h.bmr)}</b> kcal, günlük harcaman: <b>${sayi(h.tdee)}</b> kcal.<br>
+    Günlük hedefin: <b style="color:var(--yesil)">${sayi(h.kcal)} kcal</b> (haftalık ${sayi(h.kcal * 7)}) → haftada yaklaşık <b>${kesir(((h.tdee - h.kcal) * 7) / 7700)} kg</b>.<br>
+    Protein ${h.protein} g · Karb ${h.karb} g · Yağ ${h.yag} g. Kilo girdikçe hedef kendiliğinden güncellenir.`;
+}
+function ayarKaydet() {
+  const a = V.ayar;
+  Object.assign(a, { cins: $("aCins").value, yas: parseInt($("aYas").value) || a.yas, boy: parseInt($("aBoy").value) || a.boy, hedefKilo: sayiOku($("aHedefKilo").value) || 0,
+    aktivite: parseFloat($("aAktivite").value), acik: parseInt($("aAcik").value), elle: parseInt($("aElle").value) || 0, su: parseInt($("aSu").value) || 3000,
+    aksamBildirim: $("aAksam").checked, tartiBildirim: $("aTarti").checked, d: Date.now() });
+  degisti(); tost("Kaydedildi");
+}
+["aAksam", "aTarti"].forEach((id) => $(id).addEventListener("change", ayarKaydet));
+async function kodAl() { try { const v = await api("/api/kod", {}); $("kodYazi").textContent = v.kod; } catch (e) { tost(e.message); } }
+function yedekIndir() {
+  const b = new Blob([JSON.stringify(V, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `kalori-yedek-${gunAnahtari(Date.now())}.json`; a.click();
+}
+function b64ToU8(s) { const p = "=".repeat((4 - (s.length % 4)) % 4); const b = atob((s + p).replace(/-/g, "+").replace(/_/g, "/")); return Uint8Array.from(b, (c) => c.charCodeAt(0)); }
+async function bildirimAc() {
+  const d = $("bildirimDurum");
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    d.textContent = "Bu tarayıcı bildirim desteklemiyor. iPhone'da önce Safari'den Paylaş → Ana Ekrana Ekle, sonra uygulamayı ana ekrandan açıp buraya bas."; return;
+  }
+  try {
+    const izin = await Notification.requestPermission();
+    if (izin !== "granted") { d.textContent = "İzin verilmedi. Ayarlar → Bildirimler'den açabilirsin."; return; }
+    const reg = await navigator.serviceWorker.ready;
+    const { anahtar } = await api("/api/push/anahtar");
+    let abone = await reg.pushManager.getSubscription();
+    if (!abone) abone = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(anahtar) });
+    await api("/api/push/abone", abone.toJSON());
+    await api("/api/push/dene", {});
+    d.textContent = "Bildirimler açık ✅ (deneme bildirimi gönderildi)";
+  } catch (e) { d.textContent = "Olmadı: " + e.message; }
+}
+
+// ---------- menü ----------
+document.querySelectorAll(".alt-menu button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".alt-menu button").forEach((x) => x.classList.toggle("acik", x === b));
+  document.querySelectorAll(".sayfa").forEach((s) => s.classList.toggle("acik", s.id === "s-" + b.dataset.s));
+  window.scrollTo(0, 0); ciz();
+}));
+
+// ---------- başlat ----------
+function ilkKurulum() {
+  // Anketteki başlangıç kilosu (sabit id: iki cihaz aynı kaydı yaratırsa birleşir)
+}
+if (!ANAHTAR) {
+  $("eslemeEkrani").style.display = "block";
+} else {
+  $("uygulama").style.display = "block";
+  ilkKurulum(); ciz(); esitle();
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (SECILI > gunAnahtari(Date.now()) || SECILI < gunAnahtari(Date.now() - 86400000 * 400)) SECILI = gunAnahtari(Date.now()); esitle(); ciz(); } });
+  setInterval(() => { const b = gunAnahtari(Date.now()); if (ciz.sonGun && ciz.sonGun !== b && SECILI === ciz.sonGun) SECILI = b; ciz.sonGun = b; }, 60000);
+  ciz.sonGun = gunAnahtari(Date.now());
+  api("/api/durum").then((d) => ($("surumYazi").textContent = `Sürüm ${d.surum}${d.ai ? "" : " · yapay zeka kapalı"}`)).catch(() => {});
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
